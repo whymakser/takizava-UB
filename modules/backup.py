@@ -48,68 +48,61 @@ def get_files_to_backup():
     return files
 
 async def backup_cmd(client, message, args):
-    """Создает бекап всех данных"""
-    # Проверка прав
     if not is_owner(client, message.from_user.id):
         return await message.edit(
             "<blockquote><emoji id=5778527486270770928>❌</emoji> <b>Доступ запрещен</b></blockquote>",
             parse_mode=ParseMode.HTML
         )
-    
+
     ensure_backup_dir()
-    
     await message.edit(
         "<blockquote><emoji id=5891211339170326418>⌛️</emoji> <b>Создание бекапа...</b></blockquote>",
         parse_mode=ParseMode.HTML
     )
-    
+
     try:
-        # Генерируем имя файла с датой и временем
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_name = f"backup_{timestamp}.zip"
         backup_path = os.path.join(BACKUP_DIR, backup_name)
-        
-        # Получаем файлы для бекапа
         files = get_files_to_backup()
-        
+
         if not files:
             return await message.edit(
                 "<blockquote><emoji id=5778527486270770928>❌</emoji> <b>Нет файлов для бекапа</b></blockquote>",
                 parse_mode=ParseMode.HTML
             )
-        
-        # Создаем zip архив
+
         with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for file in files:
                 zipf.write(file)
-        
-        # Получаем размер архива
+
         size = os.path.getsize(backup_path)
         size_mb = size / (1024 * 1024)
-        
-        # Отправляем бекап файлом
-        await message.delete()
-        
+
         caption = (
             f"<blockquote><emoji id=5776375003280838798>✅</emoji> <b>Бекап создан!</b>\n\n"
             f"<b>Размер:</b> <code>{size_mb:.2f} MB</code>\n"
             f"<b>Файлов:</b> <code>{len(files)}</code>\n\n"
-            f"<b>Содержимое:</b>\n" + 
+            f"<b>Содержимое:</b>\n" +
             "\n".join([f"• <code>{f}</code>" for f in sorted(files)[:10]])
         )
-        
+
         if len(files) > 10:
             caption += f"\n... и ещё {len(files) - 10} файлов"
-        
         caption += "</blockquote>"
-        
+
         await client.send_document(
-            chat_id=message.chat.id,
+            chat_id=message.from_user.id,
             document=backup_path,
             caption=caption,
             parse_mode=ParseMode.HTML
         )
-        
+
+        await message.edit(
+            "<blockquote><emoji id=5877473156888188889>💾</emoji> <b>Ваш бекап был сохранён в личные сообщения!</b></blockquote>",
+            parse_mode=ParseMode.HTML
+        )
+
     except Exception as e:
         await message.edit(
             f"<blockquote><emoji id=5778527486270770928>❌</emoji> <b>Ошибка:</b> <code>{str(e)}</code></blockquote>",
