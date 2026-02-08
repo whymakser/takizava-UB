@@ -18,7 +18,7 @@ from pyrogram.errors import (
 )
 
 
-APP_TITLE = "Forelka • Telegram Web Login"
+APP_TITLE = "Forelka Autefication"
 STATE_TTL_SECONDS = 10 * 60
 
 
@@ -112,7 +112,7 @@ INDEX_HTML = """
     <div class="wrap">
       <div class="card">
         <h1>Forelka Autefication</h1>
-        <p>Этот сайт создан для аутентификации сессии<code>forelka-&lt;id&gt;.session</code>, которую потом использует ваш юзербот.</p>
+        <p>Этот сайт создан для аутентификации сессий <code>forelka-&lt;id&gt;.session</code>, которую потом использует ваш юзербот.</p>
         <p class="muted">API ID / API HASH берутся в <code>my.telegram.org</code>. Они нужны один раз</p>
 
         {% if error %}<div class="err"><b>Ошибка:</b> {{ error }}</div>{% endif %}
@@ -386,5 +386,6 @@ if __name__ == "__main__":
     # Важно: threaded=False чтобы один и тот же Pyrogram Client не прыгал между потоками
     # между шагами (код / 2FA), иначе будут ошибки event loop / thread safety.
     app.run(host=host, port=port, debug=False, threaded=False)
+
 
 
