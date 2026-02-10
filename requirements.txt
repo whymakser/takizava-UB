@@ -1,0 +1,7 @@
+telethon
+aiogram
+aiohttp
+cryptg
+pillow
+qrcode
+python-dotenv
